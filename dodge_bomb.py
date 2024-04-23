@@ -1,7 +1,9 @@
 import os
 import random
 import sys
+import time
 import pygame as pg
+
 
 WIDTH, HEIGHT = 1600, 900
 DELTA = {  # 移動量辞書
@@ -11,7 +13,14 @@ DELTA = {  # 移動量辞書
     pg.K_RIGHT: (+5, 0),
 }
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
-
+ 
+def black_out():  # 文字を画面上に出力する、black_outの機能はない
+    screen = pg.display.set_mode((WIDTH,HEIGHT))
+    fonto = pg.font.Font(None, 80)
+    txt = fonto.render("Game Over",True, (255,255,255))
+    screen.blit(txt, [650, 450])
+    toumei : int = 128  #型ヒント
+    return toumei
 
 def check_bound(obj_rct:pg.rect):
     """
@@ -26,12 +35,13 @@ def check_bound(obj_rct:pg.rect):
         tate = False
     return yoko, tate
 
-
 def main():
+    font = pg.font.Font(None, 100)
     pg.display.set_caption("逃げろ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
     bg_img = pg.image.load("fig/pg_bg.jpg")    
     kk_img = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 2.0)
+    gg_img = pg.transform.rotozoom(pg.image.load("fig/8.png"), 0, 2.0)  # gameoverの画像
     kk_rct = kk_img.get_rect()
     kk_rct.center = 900, 400
     bd_img = pg.Surface((20, 20))
@@ -40,8 +50,6 @@ def main():
     bd_rct = bd_img.get_rect()
     bd_rct.center = random.randint(0, WIDTH), random.randint(0, HEIGHT)
     vx, vy = +5, +5
-
-
     clock = pg.time.Clock()
     tmr = 0
     while True:
@@ -49,8 +57,17 @@ def main():
             if event.type == pg.QUIT: 
                 return
         if kk_rct.colliderect(bd_rct):  # こうかとんが爆弾にぶつかると終了
-            print("Game Over")
+            # 5秒を数える始める
+            hani = pg.Rect(0,0,WIDTH,HEIGHT)
+            pg.draw.rect(screen,(0,0,0), hani)  # ブラックアウトする
+            toumei = black_out()
+            bg_img.set_alpha(toumei)
+            screen.blit(bg_img,[0, 0])  # 透明化した画像を出力
+            screen.blit(gg_img,[600, 450])  # こうかとんを出力
+            pg.display.flip()
+            time.sleep(5)  #時間を5秒たつと終了させる
             return
+            
         screen.blit(bg_img, [0, 0]) 
         #こうかとんの移動
         key_lst = pg.key.get_pressed()
@@ -77,6 +94,7 @@ def main():
         pg.display.update()
         tmr += 1
         clock.tick(50)
+
 if __name__ == "__main__":
     pg.init()
     main()
