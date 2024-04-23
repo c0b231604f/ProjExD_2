@@ -14,6 +14,7 @@ DELTA = {  # 移動量辞書
 }
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
  
+ 
 def black_out():  # 文字を画面上に出力する、black_outの機能はない
     screen = pg.display.set_mode((WIDTH,HEIGHT))
     fonto = pg.font.Font(None, 80)
@@ -21,6 +22,7 @@ def black_out():  # 文字を画面上に出力する、black_outの機能はな
     screen.blit(txt, [650, 450])
     toumei : int = 128  #型ヒント
     return toumei
+
 
 def check_bound(obj_rct:pg.rect):
     """
@@ -34,6 +36,7 @@ def check_bound(obj_rct:pg.rect):
     if obj_rct.top < 0 or HEIGHT < obj_rct.bottom:
         tate = False
     return yoko, tate
+
 
 def main():
     font = pg.font.Font(None, 100)
@@ -87,9 +90,9 @@ def main():
         # 爆弾のはみだし反射
         yoko, tate = check_bound(bd_rct)
         if not yoko:
-            vx = -vx
+            vx *= -1
         if not tate:
-            vy = -vy
+            vy *= -1
 
         pg.display.update()
         tmr += 1
