@@ -11,6 +11,22 @@ DELTA = {  # 移動量辞書
     pg.K_RIGHT: (+5, 0),
 }
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
+
+def check_bound(obj_rct:pg.rect):
+    """
+    こうかとんrect、または、爆弾rectの画面内外判定用の関数
+    引数：こうかとんrect、爆弾rect
+    戻り値：よこ、たて結果判定(画面うちTrue:画面外Flase)
+    """
+    yoko, tate = True, True
+    if obj_rct.left < 0 or WIDTH < obj_rct.right:
+        yoko = False
+    if obj_rct.top < 0 or HEIGHT < obj_rct.bottom:
+        tate = False
+    return yoko, tate
+
+
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -24,6 +40,7 @@ def main():
     bd_rct = bd_img.get_rect()
     bd_rct.center = random.randint(0, WIDTH), random.randint(0, HEIGHT)
     vx, vy = +5, +5
+
 
     clock = pg.time.Clock()
     tmr = 0
@@ -39,9 +56,20 @@ def main():
                sum_mv[0] += v[0]
                sum_mv[1] += v[1]
         kk_rct.move_ip(sum_mv)
+        # こうかとんのはみだし反射
+        if check_bound(kk_rct) != (True, True):
+            kk_rct.move_ip(-sum_mv[0], -sum_mv[1])
         screen.blit(kk_img, kk_rct)
+        # 爆弾の移動と表示
         bd_rct.move_ip(vx, vy)       
         screen.blit(bd_img, bd_rct)
+        # 爆弾のはみだし反射
+        yoko, tate = check_bound(bd_rct)
+        if not yoko:
+            vx = -vx
+        if not tate:
+            vy = -vy
+
         pg.display.update()
         tmr += 1
         clock.tick(50)
